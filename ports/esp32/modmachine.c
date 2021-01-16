@@ -43,6 +43,7 @@
 #endif
 #include "esp_pm.h"
 #include "driver/touch_pad.h"
+#include "driver/gpio.h"
 
 #include "py/obj.h"
 #include "py/runtime.h"
@@ -220,6 +221,14 @@ STATIC mp_obj_t machine_enable_irq(mp_obj_t state_in) {
 }
 MP_DEFINE_CONST_FUN_OBJ_1(machine_enable_irq_obj, machine_enable_irq);
 
+STATIC mp_obj_t esp_deep_sleep_hold(const mp_obj_t enable) {
+    if (mp_obj_is_true(enable)) gpio_deep_sleep_hold_en();
+    else gpio_deep_sleep_hold_dis();
+
+    return mp_const_none;
+}
+STATIC MP_DEFINE_CONST_FUN_OBJ_1(esp_deep_sleep_hold_obj, esp_deep_sleep_hold);
+
 STATIC const mp_rom_map_elem_t machine_module_globals_table[] = {
     { MP_ROM_QSTR(MP_QSTR___name__), MP_ROM_QSTR(MP_QSTR_umachine) },
 
@@ -279,6 +288,10 @@ STATIC const mp_rom_map_elem_t machine_module_globals_table[] = {
     { MP_ROM_QSTR(MP_QSTR_TIMER_WAKE), MP_ROM_INT(ESP_SLEEP_WAKEUP_TIMER) },
     { MP_ROM_QSTR(MP_QSTR_TOUCHPAD_WAKE), MP_ROM_INT(ESP_SLEEP_WAKEUP_TOUCHPAD) },
     { MP_ROM_QSTR(MP_QSTR_ULP_WAKE), MP_ROM_INT(ESP_SLEEP_WAKEUP_ULP) },
+
+    // deep sleep hold
+    { MP_ROM_QSTR(MP_QSTR_deep_sleep_hold), MP_ROM_PTR(&esp_deep_sleep_hold_obj) },
+
 };
 
 STATIC MP_DEFINE_CONST_DICT(machine_module_globals, machine_module_globals_table);
