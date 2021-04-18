@@ -150,6 +150,19 @@ STATIC mp_obj_t machine_rtc_init(mp_obj_t self_in, mp_obj_t date) {
 STATIC MP_DEFINE_CONST_FUN_OBJ_2(machine_rtc_init_obj, machine_rtc_init);
 
 #if MICROPY_HW_RTC_USER_MEM_MAX > 0
+/*
+ * both RTC().usermem() and RTC().memory() refer to the same area in memory.
+ * RTC().memory() is here for backward compatibility.
+ */
+
+// returns a bytearray referencing the whole user memory.
+STATIC mp_obj_t machine_rtc_usermem(mp_obj_t self_in) {
+    // mp_obj_t *self = MP_OBJ_TO_PTR(self_in);
+    return mp_obj_new_bytearray_by_ref(MICROPY_HW_RTC_USER_MEM_MAX, (void *)rtc_user_mem_data);
+}
+MP_DEFINE_CONST_FUN_OBJ_1(machine_rtc_usermem_obj, machine_rtc_usermem);
+
+
 STATIC mp_obj_t machine_rtc_memory(mp_uint_t n_args, const mp_obj_t *args) {
     if (n_args == 1) {
         // read RTC memory
@@ -177,6 +190,7 @@ STATIC const mp_rom_map_elem_t machine_rtc_locals_dict_table[] = {
     { MP_ROM_QSTR(MP_QSTR_datetime), MP_ROM_PTR(&machine_rtc_datetime_obj) },
     #if MICROPY_HW_RTC_USER_MEM_MAX > 0
     { MP_ROM_QSTR(MP_QSTR_memory), MP_ROM_PTR(&machine_rtc_memory_obj) },
+    { MP_ROM_QSTR(MP_QSTR_usermem), MP_ROM_PTR(&machine_rtc_usermem_obj) },
     #endif
 };
 STATIC MP_DEFINE_CONST_DICT(machine_rtc_locals_dict, machine_rtc_locals_dict_table);
