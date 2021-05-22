@@ -60,13 +60,21 @@ typedef struct _machine_rtc_obj_t {
 #define MICROPY_HW_RTC_USER_MEM_MAX     2048
 #endif
 
+#ifdef MICROPY_HW_RTC_USER_MEM_NOINIT
+#define _USER_MEM_ATTR RTC_NOINIT_ATTR
+#else
+#define _USER_MEM_ATTR RTC_DATA_ATTR
+#endif
+
 // Optionally compile user memory functionality if the size of memory is greater than 0
 #if MICROPY_HW_RTC_USER_MEM_MAX > 0
 #define MEM_MAGIC           0x75507921
-RTC_DATA_ATTR uint32_t rtc_user_mem_magic;
-RTC_DATA_ATTR uint16_t rtc_user_mem_len;
-RTC_DATA_ATTR uint8_t rtc_user_mem_data[MICROPY_HW_RTC_USER_MEM_MAX];
+_USER_MEM_ATTR uint32_t rtc_user_mem_magic;
+_USER_MEM_ATTR uint16_t rtc_user_mem_len;
+_USER_MEM_ATTR uint8_t rtc_user_mem_data[MICROPY_HW_RTC_USER_MEM_MAX];
 #endif
+
+#undef _USER_MEM_ATTR
 
 // singleton RTC object
 STATIC const machine_rtc_obj_t machine_rtc_obj = {{&machine_rtc_type}};
